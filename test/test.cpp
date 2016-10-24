@@ -14,14 +14,18 @@ using namespace mapbox::geojson;
 
 geojson readGeoJSON(const std::string &path, bool use_convert) {
     std::ifstream t(path.c_str());
-    std::stringstream buffer;
-    buffer << t.rdbuf();
+    t.seekg(0, std::ios::end);
+    size_t size = t.tellg();
+    std::string buffer(size, ' ');
+    t.seekg(0);
+    t.read(&buffer[0], size);
+    
     if (use_convert) {
         rapidjson_document d;
-        d.Parse<0>(buffer.str().c_str());
+        d.Parse<0>(buffer.c_str());
         return convert(d);
     } else {
-        return parse(buffer.str());
+        return parse(buffer.c_str());
     }
 }
 
